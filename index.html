@@ -1,0 +1,318 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GreenCart | 簡約購物清單</title>
+    <script src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+    <script src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+    <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;800&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary: #3AA94A;
+            --primary-dark: #2E863B;
+            --primary-light: #EBF6ED;
+            --bg-color: #F4F7F5;
+            --card-bg: #FFFFFF;
+            --text-main: #2C3E50;
+            --text-muted: #7F8C8D;
+            --accent-red: #E74C3C;
+            --border-radius: 12px;
+            --card-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+            --transition: all 0.3s ease;
+        }
+
+        body.dark-mode {
+            --bg-color: #121212;
+            --card-bg: #1E1E1E;
+            --text-main: #E0E0E0;
+            --text-muted: #A0A0A0;
+            --primary-light: #1A2E1D;
+            --card-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Inter', "PingFang TC", "Microsoft JhengHei", "PingFang SC", "Microsoft YaHei", sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-main);
+            line-height: 1.6;
+            padding: 2rem 1rem;
+            transition: background-color 0.3s ease;
+        }
+
+        .container { max-width: 600px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+        .top-controls {
+            position: absolute;
+            top: -1rem;
+            right: 0;
+            display: flex;
+            gap: 10px;
+            align-items: center;
+        }
+
+        .control-btn {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-light);
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            font-size: 1.2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--text-main);
+            transition: var(--transition);
+        }
+
+        .lang-select {
+            background: var(--card-bg);
+            border: 1px solid var(--primary-light);
+            padding: 8px;
+            border-radius: 8px;
+            cursor: pointer;
+            box-shadow: var(--card-shadow);
+            color: var(--text-main);
+            font-size: 0.9rem;
+            outline: none;
+        }
+
+        header { text-align: center; margin-bottom: 2.5rem; margin-top: 2rem; }
+        .logo { display: flex; align-items: center; justify-content: center; gap: 12px; }
+        .logo h1 { font-size: 2.2rem; font-weight: 800; color: var(--primary); }
+        .subtitle { color: var(--text-muted); font-size: 1rem; }
+
+        .progress-container {
+            background: var(--card-bg);
+            padding: 1.5rem;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        .progress-header { display: flex; justify-content: space-between; margin-bottom: 0.75rem; font-weight: 600; }
+        .progress-track { height: 8px; background: var(--primary-light); border-radius: 4px; overflow: hidden; }
+        .progress-fill { height: 100%; background: var(--primary); transition: width 0.5s ease-out; }
+
+        .add-form {
+            display: flex;
+            gap: 10px;
+            background: var(--card-bg);
+            padding: 8px;
+            border-radius: var(--border-radius);
+            box-shadow: var(--card-shadow);
+            margin-bottom: 2rem;
+        }
+        .add-form input {
+            flex: 1; padding: 12px; border: 1px solid transparent;
+            background: var(--bg-color); border-radius: 8px; color: var(--text-main); outline: none;
+        }
+        .add-form select {
+            padding: 8px; border: none; background: var(--bg-color); border-radius: 8px; color: var(--text-main);
+        }
+        .add-form button {
+            background: var(--primary); color: white; border: none; padding: 0 20px;
+            border-radius: 8px; font-weight: 600; cursor: pointer;
+        }
+
+        .list-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 1rem; }
+        .action-group { display: flex; gap: 10px; }
+        .export-btn {
+            background: var(--primary-light); color: var(--primary-dark);
+            border: none; padding: 6px 12px; border-radius: 6px; font-size: 0.85rem; font-weight: 600; cursor: pointer;
+        }
+
+        .item {
+            display: flex; align-items: center; background: var(--card-bg); padding: 1rem;
+            border-radius: var(--border-radius); margin-bottom: 0.75rem; box-shadow: var(--card-shadow);
+        }
+        .item.completed { opacity: 0.6; }
+        .checkbox {
+            width: 22px; height: 22px; border: 2px solid var(--primary); border-radius: 50%;
+            margin-right: 1rem; cursor: pointer; display: flex; align-items: center; justify-content: center;
+        }
+        .item.completed .checkbox { background: var(--primary); }
+        .item.completed .checkbox::after { content: '✓'; color: white; font-size: 12px; }
+        .item-info { flex: 1; }
+        .item-name { display: block; font-weight: 500; }
+        .item.completed .item-name { text-decoration: line-through; color: var(--text-muted); }
+        .item-tag { font-size: 0.7rem; background: var(--primary-light); color: var(--primary-dark); padding: 2px 8px; border-radius: 4px; }
+        .delete-btn { background: none; border: none; color: var(--text-muted); font-size: 1.2rem; cursor: pointer; }
+
+        @media print {
+            .top-controls, .add-form, .delete-btn, .clear-btn, .export-btn { display: none !important; }
+            body { background: white; padding: 0; }
+            .container { max-width: 100%; }
+            .item { box-shadow: none; border-bottom: 1px solid #eee; }
+        }
+
+        @media (max-width: 600px) {
+            .add-form { flex-direction: column; }
+            .top-controls { position: relative; top: 0; justify-content: center; margin-bottom: 1rem; }
+        }
+    </style>
+</head>
+<body>
+    <div id="root"></div>
+
+    <script type="text/babel">
+        const { useState, useEffect, useMemo } = React;
+
+        const i18n = {
+            'zh-TW': {
+                title: 'GreenCart | 簡約購物清單',
+                subtitle: '您的簡約購物清單', progress: '購物進度', completed: '完成',
+                placeholder: '想要買什麼？', add: '新增', mylist: '我的清單',
+                clear: '清除已完成', export: '匯出 / 列印', empty: '清單目前是空的',
+                footer: '讓購物更輕鬆',
+                cats: ['生鮮食品', '家居百貨', '個人護理', '電子產品', '其他']
+            },
+            'zh-CN': {
+                title: 'GreenCart | 简约购物清单',
+                subtitle: '您的简约购物清单', progress: '购物进度', completed: '完成',
+                placeholder: '想要买什么？', add: '添加', mylist: '我的清单',
+                clear: '清除已完成', export: '导出 / 打印', empty: '清单目前是空的',
+                footer: '让购物更轻松',
+                cats: ['生鲜食品', '家居百货', '个人护理', '电子产品', '其他']
+            },
+            'en': {
+                title: 'GreenCart | Simple List',
+                subtitle: 'Your Simple Shopping List', progress: 'Progress', completed: 'Done',
+                placeholder: 'What to buy?', add: 'Add', mylist: 'My List',
+                clear: 'Clear Done', export: 'Export / Print', empty: 'List is empty',
+                footer: 'Making shopping easier',
+                cats: ['Groceries', 'Household', 'Personal', 'Electronics', 'Other']
+            },
+            'ja': {
+                title: 'GreenCart | 買い物リスト',
+                subtitle: 'シンプルな買い物リスト', progress: '進捗状況', completed: '完了',
+                placeholder: '何を買いますか？', add: '追加', mylist: 'マイリスト',
+                clear: '完了済みを削除', export: '書き出し / 印刷', empty: 'リストは空です',
+                footer: '買い物をより簡単に',
+                cats: ['食品', '日用品', '美容', '家電', 'その他']
+            },
+            'de': {
+                title: 'GreenCart | Einkaufsliste',
+                subtitle: 'Ihre einfache Einkaufsliste', progress: 'Fortschritt', completed: 'Fertig',
+                placeholder: 'Was kaufen?', add: 'Hinzufügen', mylist: 'Meine Liste',
+                clear: 'Fertige löschen', export: 'Export / Drucken', empty: 'Liste ist leer',
+                footer: 'Einkaufen einfacher machen',
+                cats: ['Lebensmittel', 'Haushalt', 'Pflege', 'Elektronik', 'Anderes']
+            }
+        };
+
+        function App() {
+            const [items, setItems] = useState(() => JSON.parse(localStorage.getItem('greencart-items') || '[]'));
+            const [lang, setLang] = useState(() => localStorage.getItem('greencart-lang') || 'zh-TW');
+            const [isDark, setIsDark] = useState(() => localStorage.getItem('greencart-theme') === 'dark');
+            const [inputValue, setInputValue] = useState('');
+            const [category, setCategory] = useState(0);
+
+            const t = i18n[lang];
+
+            useEffect(() => {
+                localStorage.setItem('greencart-items', JSON.stringify(items));
+                localStorage.setItem('greencart-lang', lang);
+                localStorage.setItem('greencart-theme', isDark ? 'dark' : 'light');
+                
+                // 動態更新系統屬性
+                document.body.classList.toggle('dark-mode', isDark);
+                document.documentElement.lang = lang; 
+                document.title = t.title;
+            }, [items, lang, isDark, t.title]);
+
+            const addItem = (e) => {
+                e.preventDefault();
+                if (!inputValue.trim()) return;
+                setItems([{ id: Date.now().toString(), name: inputValue, catIndex: category, completed: false, createdAt: Date.now() }, ...items]);
+                setInputValue('');
+            };
+
+            const sortedItems = useMemo(() => {
+                return [...items].sort((a, b) => a.completed === b.completed ? b.createdAt - a.createdAt : (a.completed ? 1 : -1));
+            }, [items]);
+
+            const exportList = () => {
+                const text = items.map(i => `${i.completed ? '[x]' : '[ ]'} ${i.name} (${t.cats[i.catIndex]})`).join('\n');
+                const blob = new Blob([`GreenCart - ${new Date().toLocaleDateString(lang)}\n\n${text}`], { type: 'text/plain' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `shopping-list-${new Date().toISOString().slice(0,10)}.txt`;
+                a.click();
+            };
+
+            const completedCount = items.filter(i => i.completed).length;
+            const progress = items.length === 0 ? 0 : Math.round((completedCount / items.length) * 100);
+
+            return (
+                <div className="container">
+                    <div className="top-controls">
+                        <select className="lang-select" value={lang} onChange={(e) => setLang(e.target.value)}>
+                            <option value="zh-TW">繁體中文</option>
+                            <option value="zh-CN">简体中文</option>
+                            <option value="en">English</option>
+                            <option value="ja">日本語</option>
+                            <option value="de">Deutsch</option>
+                        </select>
+                        <button className="control-btn" onClick={() => setIsDark(!isDark)}>
+                            {isDark ? '☀️' : '🌙'}
+                        </button>
+                    </div>
+
+                    <header>
+                        <div className="logo"><span>🛒</span><h1>GreenCart</h1></div>
+                        <p className="subtitle">{t.subtitle}</p>
+                    </header>
+
+                    <div className="progress-container">
+                        <div className="progress-header"><span>{t.progress}</span><span>{completedCount} / {items.length}</span></div>
+                        <div className="progress-track"><div className="progress-fill" style={{ width: `${progress}%` }}></div></div>
+                        <p style={{textAlign:'right', fontSize:'0.8rem', marginTop:'5px', color:'var(--primary-dark)'}}>{progress}% {t.completed}</p>
+                    </div>
+
+                    <form className="add-form" onSubmit={addItem}>
+                        <input type="text" placeholder={t.placeholder} value={inputValue} onChange={(e) => setInputValue(e.target.value)} />
+                        <select value={category} onChange={(e) => setCategory(parseInt(e.target.value))}>
+                            {t.cats.map((c, i) => <option key={i} value={i}>{c}</option>)}
+                        </select>
+                        <button type="submit">{t.add}</button>
+                    </form>
+
+                    <div className="list-header">
+                        <h2>{t.mylist}</h2>
+                        <div className="action-group">
+                            <button className="export-btn" onClick={() => window.print()}>🖨️ {t.export}</button>
+                            <button className="export-btn" onClick={exportList}>💾</button>
+                            {completedCount > 0 && <button className="clear-btn" style={{color:'var(--accent-red)'}} onClick={() => setItems(items.filter(i => !i.completed))}>{t.clear}</button>}
+                        </div>
+                    </div>
+
+                    <div className="list">
+                        {sortedItems.length > 0 ? sortedItems.map(item => (
+                            <div key={item.id} className={`item ${item.completed ? 'completed' : ''}`}>
+                                <div className="checkbox" onClick={() => setItems(items.map(i => i.id === item.id ? {...i, completed: !i.completed} : i))}></div>
+                                <div className="item-info">
+                                    <span className="item-name">{item.name}</span>
+                                    <span className="item-tag">{t.cats[item.catIndex]}</span>
+                                </div>
+                                <button className="delete-btn" onClick={() => setItems(items.filter(i => i.id !== item.id))}>✕</button>
+                            </div>
+                        )) : <div className="empty-state"><p>{t.empty}</p></div>}
+                    </div>
+
+                    <footer style={{ textAlign: 'center', padding: '2rem', color: '#7F8C8D', fontSize: '0.85rem' }}>
+                        <p>© 2026 GreenCart - {t.footer}</p>
+                    </footer>
+                </div>
+            );
+        }
+
+        const root = ReactDOM.createRoot(document.getElementById('root'));
+        root.render(<App />);
+    </script>
+</body>
+</html>

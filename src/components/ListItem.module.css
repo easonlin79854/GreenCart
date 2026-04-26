@@ -1,0 +1,89 @@
+.item {
+  display: flex;
+  align-items: center;
+  background: var(--card-bg);
+  padding: 1rem;
+  border-radius: var(--border-radius);
+  margin-bottom: 0.75rem;
+  box-shadow: var(--card-shadow);
+  transition: var(--transition);
+  animation: slideIn 0.3s ease-out;
+}
+
+@keyframes slideIn {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.completed {
+  opacity: 0.7;
+}
+
+.checkboxWrapper {
+  cursor: pointer;
+  padding-right: 1rem;
+}
+
+.checkbox {
+  width: 24px;
+  height: 24px;
+  border: 2px solid var(--primary);
+  border-radius: 6px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: var(--transition);
+}
+
+.completed .checkbox {
+  background: var(--primary);
+}
+
+.checkIcon {
+  color: white;
+  font-size: 0.8rem;
+  font-weight: bold;
+}
+
+.content {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+.name {
+  font-weight: 500;
+  font-size: 1.05rem;
+  transition: var(--transition);
+}
+
+.completed .name {
+  text-decoration: line-through;
+  color: var(--text-muted);
+}
+
+.categoryTag {
+  font-size: 0.75rem;
+  background: var(--primary-light);
+  color: var(--primary-dark);
+  padding: 2px 8px;
+  border-radius: 4px;
+  width: fit-content;
+  margin-top: 4px;
+}
+
+.deleteBtn {
+  background: transparent;
+  color: var(--text-muted);
+  font-size: 1.2rem;
+  padding: 8px;
+  opacity: 0;
+}
+
+.item:hover .deleteBtn {
+  opacity: 1;
+}
+
+.deleteBtn:hover {
+  color: var(--accent-red);
+}

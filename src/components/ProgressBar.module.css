@@ -1,0 +1,45 @@
+.container {
+  background: var(--card-bg);
+  padding: 1.5rem;
+  border-radius: var(--border-radius);
+  box-shadow: var(--card-shadow);
+  margin-bottom: 2rem;
+}
+
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+}
+
+.label {
+  font-weight: 600;
+  color: var(--text-main);
+}
+
+.stats {
+  font-size: 0.9rem;
+  color: var(--text-muted);
+}
+
+.track {
+  height: 8px;
+  background: var(--bg-color);
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 0.5rem;
+}
+
+.fill {
+  height: 100%;
+  background: var(--primary);
+  transition: width 0.5s ease-out;
+}
+
+.percentage {
+  font-size: 0.8rem;
+  color: var(--primary-dark);
+  text-align: right;
+  font-weight: 500;
+}
